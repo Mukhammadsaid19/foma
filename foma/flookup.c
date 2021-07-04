@@ -30,31 +30,10 @@
 #define UDP_MAX 65535
 #define FLOOKUP_PORT 6062
 
-static char *usagestring = "Usage: flookup [-h] [-a] [-i] [-s \"separator\"] [-w \"wordseparator\"] [-v] [-x] [-b] [-I <#|#k|#m|f>] [-S] [-P] [-A] <binary foma file>\n";
+static char *usagestring = "Usage: flookup <binary foma file>\n";
 
 static char *helpstring =
-"Applies words from stdin to a foma transducer/automaton read from a file and prints results to stdout.\n"
-
-"If the file contains several nets, inputs will be passed through all of them (simulating composition) or applied as alternates if the -a flag is specified (simulating priority union: the first net is tried first, if that fails to produce an output, then the second is tried, etc.).\n\n"
-"Options:\n\n"
-"-h\t\tprint help\n"
-"-a\t\ttry alternatives (in order of nets loaded, default is to pass words through each)\n"
-"-b\t\tunbuffered output (flushes output after each input word, for use in bidirectional piping)\n"
-"-i\t\tinverse application (apply down instead of up)\n"
-"-I indextype\tindex arcs with indextype (one of -I f -I #k -I #m or -I #)\n"
-"\t\t(usually slower than the default except for states > 1,000 arcs)\n"
-"\t\t  -I # will index all states containing # arcs or more\n"
-"\t\t  -I NUMk will index states from densest to sparsest until reaching mem limit of # kB\n"
-"\t\t  -I NUMM will index states from densest to sparsest until reaching mem limit of # MB\n"
-"\t\t  -I f will index flag-containing states only\n"
-"-q\t\tdon't sort arcs before applying (usually slower, except for really small, sparse automata)\n"
-"-S\t\trun flookup as UDP server (default addr INADDR_ANY port 6062)\n"
-"-A\t\t  specify address of server\n"
-"-P\t\t  specify port of server (default 6062)\n"
-"-s \"separator\"\tchange input/output separator symbol (default is TAB)\n"
-"-w \"separator\"\tchange words separator symbol (default is LF)\n"
-"-v\t\tprint version number\n"
-"-x\t\tdon't echo input string";
+"Applies words from stdin to a foma transducer/automaton read from a file and prints results to stdout.\n";
 
 struct lookup_chain {
     struct fsm *net;
@@ -81,7 +60,6 @@ static char *(*applyer)() = &apply_med;  /* Default apply direction = up */
 static void handle_line(char *s);
 static void app_print(char *result);
 static char *get_next_line();
-static void server_init();
 
 void app_print(char *result) {
 
@@ -93,22 +71,6 @@ void app_print(char *result) {
 	    fprintf(stdout,"+?\n");
 	} else {
 	    fprintf(stdout, "%s\n", result);
-	}
-    } else {
-	if (echo == 1) {
-	    strncat(serverstring+udpsize, line, UDP_MAX-udpsize);
-	    udpsize += strlen(line);
-	    strncat(serverstring+udpsize, separator, UDP_MAX-udpsize);
-	    udpsize += strlen(separator);
-	}
-	if (result == NULL) {
-	    strncat(serverstring+udpsize, "?+\n", UDP_MAX-udpsize);
-	    udpsize += 3;
-	} else {
-	    strncat(serverstring+udpsize, result, UDP_MAX-udpsize);
-	    udpsize += strlen(result);
-	    strncat(serverstring+udpsize, "\n", UDP_MAX-udpsize);
-	    udpsize++;
 	}
     }
 }
@@ -122,60 +84,15 @@ int main(int argc, char *argv[]) {
 
   while ((opt = getopt(argc, argv, "abhHimI:qs:SA:P:w:vx")) != -1) {
    switch(opt) {
-	case 'a':
-		apply_alternates = 1;
-		break;
-	case 'b':
-		buffered_output = 0;
-		break;
 	case 'h':
 	printf("%s%s\n", usagestring,helpstring);
 		exit(0);
-	case 'i':
-		direction = DIR_DOWN;
-		applyer = &apply_down;
-		break;
-	case 'q':
-		sortarcs = 0;
-		break;
-	case 'I':
-	    if (strcmp(optarg, "f") == 0) {
-		index_flag_states = 1;
-		index_arcs = 1;
-	    } else if (strstr(optarg, "k") != NULL && strstr(optarg,"K") != NULL) {
-		/* k limit */
-		index_mem_limit = 1024*atoi(optarg);
-		index_arcs = 1;
-	    } else if (strstr(optarg, "m") != NULL && strstr(optarg,"M") != NULL) {
-		/* m limit */
-		index_mem_limit = 1024*1024*atoi(optarg);
-		index_arcs = 1;
-	    } else if (isdigit(*optarg)) {
-		index_arcs = 1;
-		index_cutoff = atoi(optarg);
-	    }
-	    break;
-	case 's':
-	    separator = strdup(optarg);
-	    break;
-	case 'S':
-	    mode_server = 1;
-	    break;
-	case 'A':
-	    server_address = strdup(optarg);
-	    break;
-	case 'P':
-	    port_number = atoi(optarg);
-	    break;
 	case 'w':
 	    wordseparator = strdup(optarg);
 	    break;
-        case 'v':
+    case 'v':
 	    printf("flookup 1.03 (foma library version %s)\n", fsm_get_library_version_string());
 	    exit(0);
-        case 'x':
-	    echo = 0;
-	    break;
 	default:
             fprintf(stderr, "%s", usagestring);
             exit(EXIT_FAILURE);
@@ -209,9 +126,9 @@ int main(int argc, char *argv[]) {
 		// }
 		chain_new->net = net;
 		chain_new->ah = apply_med_init(net);
-		apply_med_set_heap_max(chain_new->ah, 4194304);    /* Don't grow heap more than this            */
-		apply_med_set_med_limit(chain_new->ah, 10);       /* Don't search for matches with cost > 10   */
-		apply_med_set_med_cutoff(chain_new->ah, 5);       /* Don't return more than 5 matches          */
+		// apply_med_set_heap_max(chain_new->ah, 4194304);    /* Don't grow heap more than this            */
+		// apply_med_set_med_limit(chain_new->ah, 10);       /* Don't search for matches with cost > 10   */
+		// apply_med_set_med_cutoff(chain_new->ah, 5);       /* Don't return more than 5 matches          */
 
 		// if (direction == DIR_DOWN && index_arcs) {
 		// 	apply_index(chain_new->ah, APPLY_INDEX_INPUT, index_cutoff, index_mem_limit, index_flag_states);
@@ -220,16 +137,10 @@ int main(int argc, char *argv[]) {
 		// 	apply_index(chain_new->ah, APPLY_INDEX_OUTPUT, index_cutoff, index_mem_limit, index_flag_states);
 		// }
 
-
-
 		chain_new->next = NULL;
 		chain_new->prev = NULL;
 		if (chain_tail == NULL) {
 			chain_tail = chain_head = chain_new;
-		} else if (direction == DIR_DOWN || apply_alternates == 1) {
-			chain_tail->next = chain_new;
-			chain_new->prev = chain_tail;
-			chain_tail = chain_new;
 		} else {
 			chain_new->next = chain_head;
 			chain_head->prev = chain_new;
@@ -242,35 +153,6 @@ int main(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
     }
 
-    if (mode_server) {
-	server_init();
-	serverstring = calloc(UDP_MAX+1, sizeof(char));
-	line = calloc(UDP_MAX+1, sizeof(char));
-	addrlen = sizeof(clientaddr);
-	for (;;) {
-	    numbytes = recvfrom(listen_sd, line, UDP_MAX, 0,(struct sockaddr *)&clientaddr, &addrlen);
-	    if (numbytes == -1) {
-		perror("recvfrom() failed, aborting");
-		break;
-	    }
-	    line[numbytes] = '\0';
-	    line[strcspn(line, "\n\r")] = '\0';
-	    fflush(stdout);
-	    results = 0;
-	    udpsize = 0;
-	    serverstring[0] = '\0';
-	    handle_line(line);
-	    if (results == 0) {
-		app_print(NULL);
-	    }
-	    if (serverstring[0] != '\0') {
-		numbytes = sendto(listen_sd, serverstring, strlen(serverstring), 0, (struct sockaddr *)&clientaddr, addrlen);
-		if (numbytes < 0) {
-		    perror("sendto() failed"); fflush(stdout);
-		}
-	    }
-	}
-    } else {
 	/* Standard read from stdin */
 	line = calloc(LINE_LIMIT, sizeof(char));
 	INFILE = stdin;
@@ -285,13 +167,12 @@ int main(int argc, char *argv[]) {
 		fflush(stdout);
 	    }
 	  }
-    }
 	
    /* Cleanup */
     for (chain_pos = chain_head; chain_pos != NULL; chain_pos = chain_head) {
 	chain_head = chain_pos->next;
 	if (chain_pos->ah != NULL) {
-	    apply_clear(chain_pos->ah);
+	    apply_med_clear(chain_pos->ah);
 	}
 	if (chain_pos->net != NULL) {
 	    fsm_destroy(chain_pos->net);
@@ -315,31 +196,13 @@ char *get_next_line() {
 
 void handle_line(char *s) {
     char *result, *tempstr;
-    /* Apply alternative */
-    if (apply_alternates == 1) {
-	for (chain_pos = chain_head, tempstr = s;   ; chain_pos = chain_pos->next) {
-	    result = applyer(chain_pos->ah, tempstr);
-	    if (result != NULL) {
-		results++;
-		app_print(result);
-		while ((result = applyer(chain_pos->ah, NULL)) != NULL) {
-		    results++;
-		    app_print(result);
-		}
-		break;
-	    }
-	    if (chain_pos == chain_tail) {
-		break;
-	    }
-	}
-    } else {
 
 	/* Get result from chain */
 	for (chain_pos = chain_head, tempstr = s;  ; chain_pos = chain_pos->next) {
 	    result = applyer(chain_pos->ah, tempstr);
 	    if (result != NULL && chain_pos != chain_tail) {
-		tempstr = result;
-		continue;
+			tempstr = result;
+			continue;
 	    }
 	    if (result != NULL && chain_pos == chain_tail) {
 		do {
@@ -361,36 +224,4 @@ void handle_line(char *s) {
 		break;
 	    }
 	}
-    }
-}
-
-void server_init(void) {
-    unsigned int rcvsize = 262144;
-
-    if ((listen_sd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-	perror("socket() failed");
-	exit(1);
-    }
-    if (setsockopt(listen_sd, SOL_SOCKET, SO_RCVBUF, (char *) &rcvsize, sizeof(rcvsize)) < 0) {
-    	perror("setsockopt() failed");
-    	exit(1);
-    }
-    if (setsockopt(listen_sd, SOL_SOCKET, SO_SNDBUF, (char *) &rcvsize, sizeof(rcvsize)) < 0) {
-    	perror("setsockopt() failed");
-    	exit(1);
-    }
-
-    memset((char *) &serveraddr, 0, sizeof(serveraddr));
-    serveraddr.sin_family = AF_INET;
-    serveraddr.sin_port = htons(port_number);
-    if (server_address != NULL) {
-	serveraddr.sin_addr.s_addr = inet_addr(server_address);
-    } else {
-	serveraddr.sin_addr.s_addr = INADDR_ANY;
-    }
-    if (bind(listen_sd, (struct sockaddr *) &serveraddr, sizeof(serveraddr)) == -1) {
-	perror("bind() failed");
-	exit(1);
-    }
-    printf("Started flookup server on %s port %i\n", inet_ntoa(serveraddr.sin_addr), port_number); fflush(stdout);
 }
