@@ -59,12 +59,14 @@ static char *helpstring =
 struct lookup_chain {
     struct fsm *net;
     struct apply_handle *ah;
+	struct apply_med_handle *medh;
     struct lookup_chain *next;
     struct lookup_chain *prev;
 };
 
 #define DIR_DOWN 0
 #define DIR_UP 1
+#define MED 2
 
 static struct sockaddr_in serveraddr, clientaddr;
 static int                listen_sd, numbytes;
@@ -135,6 +137,10 @@ int main(int argc, char *argv[]) {
 	    direction = DIR_DOWN;
 	    applyer = &apply_down;
 	    break;
+		case 'm':
+		direction = MED;
+		applyer = &apply_med;
+		break;
         case 'q':
 	    sortarcs = 0;
 	    break;
@@ -205,12 +211,18 @@ int main(int argc, char *argv[]) {
 	}
 	chain_new->net = net;
 	chain_new->ah = apply_init(net);
+	chain_new->medh = apply_med_init(net);
+
 	if (direction == DIR_DOWN && index_arcs) {
 	    apply_index(chain_new->ah, APPLY_INDEX_INPUT, index_cutoff, index_mem_limit, index_flag_states);
 	}
 	if (direction == DIR_UP && index_arcs) {
 	    apply_index(chain_new->ah, APPLY_INDEX_OUTPUT, index_cutoff, index_mem_limit, index_flag_states);
 	}
+
+	// if (direction == MED && index_arcs) {
+	// 	apply_med(chain_new->medh, )
+	// }
 
 	chain_new->next = NULL;
 	chain_new->prev = NULL;
@@ -280,7 +292,7 @@ int main(int argc, char *argv[]) {
     for (chain_pos = chain_head; chain_pos != NULL; chain_pos = chain_head) {
 	chain_head = chain_pos->next;
 	if (chain_pos->ah != NULL) {
-	    apply_clear(chain_pos->ah);
+	    apply_clear(chain_pos->medh);
 	}
 	if (chain_pos->net != NULL) {
 	    fsm_destroy(chain_pos->net);
@@ -325,7 +337,7 @@ void handle_line(char *s) {
 
 	/* Get result from chain */
 	for (chain_pos = chain_head, tempstr = s;  ; chain_pos = chain_pos->next) {
-	    result = applyer(chain_pos->ah, tempstr);
+	    result = applyer(chain_pos->medh, tempstr);
 	    if (result != NULL && chain_pos != chain_tail) {
 		tempstr = result;
 		continue;
@@ -334,12 +346,12 @@ void handle_line(char *s) {
 		do {
 		    results++;
 		    app_print(result);
-		} while ((result = applyer(chain_pos->ah, NULL)) != NULL);
+		} while ((result = applyer(chain_pos->medh, NULL)) != NULL);
 	    }
 	    if (result == NULL) {
 		/* Move up */
 		for (chain_pos = chain_pos->prev; chain_pos != NULL; chain_pos = chain_pos->prev) {
-		    result = applyer(chain_pos->ah, NULL);
+		    result = applyer(chain_pos->medh, NULL);
 		    if (result != NULL) {
 			tempstr = result;
 			break;
