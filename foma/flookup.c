@@ -4,12 +4,14 @@
 #include <unistd.h>
 #include "fomalib.h"
 
-static char *mystring, *result;
+static char *result;
 struct apply_med_handle *medh;
 struct fsm *net;
 
-int main (int argc, char **argv)
+
+int main ()
 {
+	net = fsm_read_binary_file("myfst.foma"); 
 
     medh = apply_med_init(net);
 
@@ -17,10 +19,12 @@ int main (int argc, char **argv)
     apply_med_set_med_limit(medh, 10); 
     apply_med_set_med_cutoff(medh, 5); 
 
-    while (result = apply_med(medh, mystring)) {
-        mystring = NULL;
-        printf("%s", result);
-    }
+	apply_med_set_align_symbol(medh, "-");
+
+	while (result = apply_med(medh, "bola")) {
+		mystring = NULL;
+		printf("%s\n%s\nCost:%i\n\n", result, apply_med_get_instring(medh), apply_med_get_cost(medh));
+	}
 
     // int aflag = 0;
     // int bflag = 0;
