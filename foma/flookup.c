@@ -11,7 +11,7 @@ struct fsm *net;
 
 int main ()
 {
-	net = fsm_read_binary_file("myfst.foma"); 
+	net = fsm_read_binary_file("nouns.fst"); 
 
     medh = apply_med_init(net);
 
