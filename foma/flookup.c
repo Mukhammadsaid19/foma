@@ -122,8 +122,8 @@ int main(int argc, char *argv[]) {
 
     setvbuf(stdout, buffer, _IOFBF, sizeof(buffer));
 
-    while ((opt = getopt(argc, argv, "abhHiI:qs:SA:P:w:vx")) != -1) {
-        switch(opt) {
+  while ((opt = getopt(argc, argv, "abhHimI:qs:SA:P:w:vx")) != -1) {
+    switch(opt) {
         case 'a':
 	    apply_alternates = 1;
 	    break;
