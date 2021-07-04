@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 
     setvbuf(stdout, buffer, _IOFBF, sizeof(buffer));
 
-  while ((opt = getopt(argc, argv, "a")) != -1) {
+  while ((opt = getopt(argc, argv, "mabhHiI:qs:SA:P:w:vx")) != -1) {
     switch(opt) {
         case 'a':
 	    	apply_alternates = 1;
