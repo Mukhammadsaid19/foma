@@ -4,27 +4,26 @@
 #include <unistd.h>
 #include "fomalib.h"
 
-static char *mystring = "bolaa"; 
-static char *result;
-struct apply_med_handle *medh;
-struct fsm *net;
 
+int main () {
+	char *mystring = "bolaa"; 
+	char *result;
+	struct apply_med_handle *medh;
+	struct fsm *net;
 
-int main ()
-{
 	net = fsm_read_binary_file("nouns.fst"); 
 
 	printf("loaded this shit\n");
 
     medh = apply_med_init(net);
-
 	printf("initialized medh\n");
 
-    apply_med_set_heap_max(medh, 4194304);
+	apply_med_set_heap_max(medh, 4194304);
     apply_med_set_med_limit(medh, 10); 
     apply_med_set_med_cutoff(medh, 5); 
 
 	printf("set up with parameters\n");
+
 
 	while (result = apply_med(medh, mystring)) {
 		printf("looping through...");
