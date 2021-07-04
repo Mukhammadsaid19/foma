@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "fomalib.h"
 
+static char *mystring = "bolaa"; 
 static char *result;
 struct apply_med_handle *medh;
 struct fsm *net;
@@ -21,7 +22,7 @@ int main ()
 
 	apply_med_set_align_symbol(medh, "-");
 
-	while (result = apply_med(medh, "bola")) {
+	while (result = apply_med(medh, mystring)) {
 		mystring = NULL;
 		printf("%s\n%s\nCost:%i\n\n", result, apply_med_get_instring(medh), apply_med_get_cost(medh));
 	}
