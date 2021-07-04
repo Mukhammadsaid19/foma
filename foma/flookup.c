@@ -14,15 +14,20 @@ int main ()
 {
 	net = fsm_read_binary_file("nouns.fst"); 
 
+	printf("loaded this shit\n");
+
     medh = apply_med_init(net);
+
+	printf("initialized medh\n");
 
     apply_med_set_heap_max(medh, 4194304);
     apply_med_set_med_limit(medh, 10); 
     apply_med_set_med_cutoff(medh, 5); 
 
-	apply_med_set_align_symbol(medh, "-");
+	printf("set up with parameters\n");
 
 	while (result = apply_med(medh, mystring)) {
+		printf("looping through...");
 		mystring = NULL;
 		printf("%s\n%s\nCost:%i\n\n", result, apply_med_get_instring(medh), apply_med_get_cost(medh));
 	}
