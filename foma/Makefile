@@ -20,12 +20,15 @@ CFLAGS = -O3 -Wall -D_GNU_SOURCE -std=c99 -fvisibility=hidden -fPIC
 FOMAOBJS = foma.o stack.o iface.o lex.interface.o
 LIBOBJS = int_stack.o define.o determinize.o apply.o rewrite.o lexcread.o topsort.o flags.o minimize.o reverse.o extract.o sigma.o io.o structures.o constructions.o coaccessible.o utf8.o spelling.o dynarray.o mem.o stringhash.o trie.o lex.lexc.o lex.yy.o lex.cmatrix.o regex.o
 
-all: libfoma foma flookup cgflookup
+all: libfoma foma flookup cgflookup custom
 
 foma: $(FOMAOBJS) $(LIBOBJS)
 	$(CC) $(CFLAGS) $(FOMAOBJS) $(LIBOBJS) $(LDFLAGS) -o $@
 
 flookup: flookup.o libfoma
+	$(CC) $(CFLAGS) flookup.o $(FLOOKUPLDFLAGS) -o $@
+
+custom: custom.o libfoma
 	$(CC) $(CFLAGS) flookup.o $(FLOOKUPLDFLAGS) -o $@
 
 cgflookup: cgflookup.o libfoma
