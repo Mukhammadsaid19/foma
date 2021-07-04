@@ -122,70 +122,70 @@ int main(int argc, char *argv[]) {
 
     setvbuf(stdout, buffer, _IOFBF, sizeof(buffer));
 
-  while ((opt = getopt(argc, argv, "abhHimI:qs:SA:P:w:vx")) != -1) {
+  while ((opt = getopt(argc, argv, "m:abhHiI:qs:SA:P:w:vx")) != -1) {
     switch(opt) {
         case 'a':
-	    apply_alternates = 1;
-	    break;
+	    	apply_alternates = 1;
+	    	break;
         case 'b':
-	    buffered_output = 0;
-	    break;
+	    	buffered_output = 0;
+	    	break;
         case 'h':
-	    printf("%s%s\n", usagestring,helpstring);
+	    	printf("%s%s\n", usagestring,helpstring);
             exit(0);
         case 'i':
-	    direction = DIR_DOWN;
-	    applyer = &apply_down;
-	    break;
+	    	direction = DIR_DOWN;
+	    	applyer = &apply_down;
+	    	break;
 		case 'm':
-		direction = MED;
-		applyer = &apply_med;
-		break;
+			direction = MED;
+			applyer = &apply_med;
+			break;
         case 'q':
-	    sortarcs = 0;
-	    break;
-	case 'I':
-	    if (strcmp(optarg, "f") == 0) {
-		index_flag_states = 1;
-		index_arcs = 1;
-	    } else if (strstr(optarg, "k") != NULL && strstr(optarg,"K") != NULL) {
-		/* k limit */
-		index_mem_limit = 1024*atoi(optarg);
-		index_arcs = 1;
-	    } else if (strstr(optarg, "m") != NULL && strstr(optarg,"M") != NULL) {
-		/* m limit */
-		index_mem_limit = 1024*1024*atoi(optarg);
-		index_arcs = 1;
-	    } else if (isdigit(*optarg)) {
-		index_arcs = 1;
-		index_cutoff = atoi(optarg);
-	    }
-	    break;
-	case 's':
-	    separator = strdup(optarg);
-	    break;
-	case 'S':
-	    mode_server = 1;
-	    break;
-	case 'A':
-	    server_address = strdup(optarg);
-	    break;
-	case 'P':
-	    port_number = atoi(optarg);
-	    break;
-	case 'w':
-	    wordseparator = strdup(optarg);
-	    break;
-        case 'v':
-	    printf("flookup 1.03 (foma library version %s)\n", fsm_get_library_version_string());
-	    exit(0);
-        case 'x':
-	    echo = 0;
-	    break;
-	default:
-            fprintf(stderr, "%s", usagestring);
-            exit(EXIT_FAILURE);
-	}
+	    	sortarcs = 0;
+	    	break;
+		case 'I':
+			if (strcmp(optarg, "f") == 0) {
+			index_flag_states = 1;
+			index_arcs = 1;
+			} else if (strstr(optarg, "k") != NULL && strstr(optarg,"K") != NULL) {
+			/* k limit */
+			index_mem_limit = 1024*atoi(optarg);
+			index_arcs = 1;
+			} else if (strstr(optarg, "m") != NULL && strstr(optarg,"M") != NULL) {
+			/* m limit */
+			index_mem_limit = 1024*1024*atoi(optarg);
+			index_arcs = 1;
+			} else if (isdigit(*optarg)) {
+			index_arcs = 1;
+			index_cutoff = atoi(optarg);
+			}
+			break;
+		case 's':
+			separator = strdup(optarg);
+			break;
+		case 'S':
+			mode_server = 1;
+			break;
+		case 'A':
+			server_address = strdup(optarg);
+			break;
+		case 'P':
+			port_number = atoi(optarg);
+			break;
+		case 'w':
+			wordseparator = strdup(optarg);
+			break;
+			case 'v':
+			printf("flookup 1.03 (foma library version %s)\n", fsm_get_library_version_string());
+			exit(0);
+			case 'x':
+			echo = 0;
+			break;
+		default:
+			fprintf(stderr, "%s", usagestring);
+			exit(EXIT_FAILURE);
+		}
     }
     if (optind == argc) {
 	fprintf(stderr, "%s", usagestring);
