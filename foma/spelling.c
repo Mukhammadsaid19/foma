@@ -239,7 +239,7 @@ char *apply_med(struct apply_med_handle *medh, char *word) {
 
 
     if (word == NULL) {
-	goto resume;
+	    goto resume;
     }
 
     medh->word = word;
