@@ -47,64 +47,64 @@ int g_list_limit = 10;
 // }
 
 int main () {
-    int i;
-    char *word = "bola"; 
-    char *result;
-    struct apply_handle *ah;
-	struct fsm *net;
-
-    net = fsm_read_binary_file("tokenize.fst");
-
-    printf("Loaded tokenize.fst file...\n");
-
-    ah = apply_init(net);
-
-    apply_set_print_space(ah, g_print_space);
-    apply_set_print_pairs(ah, g_print_pairs);
-    apply_set_show_flags(ah, g_show_flags);
-    apply_set_obey_flags(ah, g_obey_flags);
-
-    printf("Initialized ah...\n");
-
-    result = apply_up(ah, word);
-
-    if (result == NULL) {
-        printf("???\n");
-        return;
-    } else {
-        printf("%s\n",result);
-    }
-    for (i = g_list_limit; i > 0; i--) {
-        result = apply_up(ah, NULL);
-        if (result == NULL)
-            break;
-        printf("%s\n",result);
-    }
-
-	// char *mystring = "bolaa"; 
-	// char *result;
-	// struct apply_med_handle *medh;
+    // int i;
+    // char *word = "bola"; 
+    // char *result;
+    // struct apply_handle *ah;
 	// struct fsm *net;
 
-	// net = fsm_read_binary_file("nouns.fst"); 
+    // net = fsm_read_binary_file("tokenize.fst");
 
-	// printf("loaded this file\n");
+    // printf("Loaded tokenize.fst file...\n");
 
-    // medh = apply_med_init(net);
-	// printf("initialized medh\n");
+    // ah = apply_init(net);
 
-	// apply_med_set_heap_max(medh, 4194304);
-    // apply_med_set_med_limit(medh, 10); 
-    // apply_med_set_med_cutoff(medh, 5); 
+    // apply_set_print_space(ah, g_print_space);
+    // apply_set_print_pairs(ah, g_print_pairs);
+    // apply_set_show_flags(ah, g_show_flags);
+    // apply_set_obey_flags(ah, g_obey_flags);
 
-	// printf("set up with parameters\n");
+    // printf("Initialized ah...\n");
+
+    // result = apply_up(ah, word);
+
+    // if (result == NULL) {
+    //     printf("???\n");
+    //     return;
+    // } else {
+    //     printf("%s\n",result);
+    // }
+    // for (i = g_list_limit; i > 0; i--) {
+    //     result = apply_up(ah, NULL);
+    //     if (result == NULL)
+    //         break;
+    //     printf("%s\n",result);
+    // }
+
+	char *mystring = "bolaa"; 
+	char *result;
+	struct apply_med_handle *medh;
+	struct fsm *net;
+
+	net = fsm_read_binary_file("nouns.fst"); 
+
+	printf("loaded this file\n");
+
+    medh = apply_med_init(net);
+	printf("initialized medh\n");
+
+	apply_med_set_heap_max(medh, 4194304);
+    apply_med_set_med_limit(medh, 10); 
+    apply_med_set_med_cutoff(medh, 5); 
+
+	printf("set up with parameters\n");
 
 
-	// while (result = apply_med(medh, mystring)) {
-	// 	printf("looping through...");
-	// 	mystring = NULL;
-	// 	printf("%s\n%s\nCost:%i\n\n", result, apply_med_get_instring(medh), apply_med_get_cost(medh));
-	// }
+	while (result = apply_med(medh, mystring)) {
+		printf("looping through...");
+		mystring = NULL;
+		printf("%s\n%s\nCost:%i\n\n", result, apply_med_get_instring(medh), apply_med_get_cost(medh));
+	}
 
     // int aflag = 0;
     // int bflag = 0;
