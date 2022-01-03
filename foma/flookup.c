@@ -42,14 +42,14 @@
 //     }
 // }
 
-int main () {
+int main(int argc, char **argv) {
     int print_space = 0;
     int print_pairs = 0;
     int show_flags = 0;
     int obey_flags = 1;
     int list_limit = 10;
     int i;
-    char *word = "bolaga. Keldimi"; 
+    char *sentence = argv[1];
     char *result;
     struct apply_handle *ah;
 	struct fsm *net;
@@ -67,7 +67,7 @@ int main () {
 
     printf("Initialized ah...\n");
 
-    result = apply_up(ah, word);
+    result = apply_up(ah, sentence);
 
     if (result == NULL) {
         printf("???\n");
