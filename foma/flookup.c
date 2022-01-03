@@ -49,7 +49,7 @@ int main () {
     int obey_flags = 1;
     int list_limit = 10;
     int i;
-    char *word = "bola"; 
+    char *word = "bolaga. Keldimi"; 
     char *result;
     struct apply_handle *ah;
 	struct fsm *net;
@@ -81,6 +81,10 @@ int main () {
             break;
         printf("%s\n",result);
     }
+
+    getchar();
+
+    return 0;
 
 	// char *mystring = "bolaa"; 
 	// char *result;
@@ -146,5 +150,5 @@ int main () {
 
     // for (index = optind; index < argc; index++)
     //     printf ("Non-option argument %s\n", argv[index]);
-    return 0;
+    // return 0;
 }
