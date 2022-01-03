@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
         printf("%s\n",result);
     }
 
-    getchar();
+    // getchar();
 
     return 0;
 
