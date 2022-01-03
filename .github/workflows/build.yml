@@ -8,28 +8,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-linux:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: build
-      run: cd foma && make
-
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: dist-linux
-        path: |
-          foma/foma
-          foma/flookup
-          foma/cgflookup
-          foma/libfoma.so.*
-          foma/README*
-          foma/CHANGELOG
-          foma/COPYING
 
   build-windows:
 
@@ -67,26 +45,3 @@ jobs:
           foma/CHANGELOG
           foma/COPYING
           
-  build-macos:
-
-    runs-on: macos-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Compile Foma
-      run: brew install bison && export PATH="$(brew --prefix bison)/bin:$PATH" && cd foma && make
-
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: dist-macos
-        path: |
-          foma/foma
-          foma/cgflookup
-          foma/flookup
-          foma/libfoma.a
-          foma/libfoma.*.dylib
-          foma/README*
-          foma/CHANGELOG
-          foma/COPYING
