@@ -20,7 +20,7 @@ CFLAGS = -O3 -Wall -D_GNU_SOURCE -std=c99 -fvisibility=hidden -fPIC
 FOMAOBJS = foma.o stack.o iface.o lex.interface.o
 LIBOBJS = int_stack.o define.o determinize.o apply.o rewrite.o lexcread.o topsort.o flags.o minimize.o reverse.o extract.o sigma.o io.o structures.o constructions.o coaccessible.o utf8.o spelling.o dynarray.o mem.o stringhash.o trie.o lex.lexc.o lex.yy.o lex.cmatrix.o regex.o
 
-all: libfoma foma flookup cgflookup custom
+all: libfoma foma flookup cgflookup custom libfoma_win
 
 foma: $(FOMAOBJS) $(LIBOBJS)
 	$(CC) $(CFLAGS) $(FOMAOBJS) $(LIBOBJS) $(LDFLAGS) -o $@
@@ -77,6 +77,11 @@ $(SHAREDLIBV): $(LIBOBJS)
 	$(RANLIB) $(STATICLIB)
 	$(CC) $(CFLAGS) -shared -Wl,$(DFLAG),$(SHAREDLIBM) -o $(SHAREDLIBV) $(LIBOBJS) $(LDFLAGS)
 
+libfoma_win: libfoma_win.dll:
+	$(AR) $(ARFLAGS) $(STATICLIB) $(LIBOBJS)
+	$(RANLIB) $(STATICLIB)
+	$(CC) $(CFLAGS) -shared -Wl,$(DFLAG),libfoma_win.dll -o libfoma_win_01.dll $(LIBOBJS) $(LDFLAGS)
+
 install: foma libfoma libfoma.pc
 	-@if [ ! -d $(exec_prefix) ]; then mkdir -p $(exec_prefix); fi
 	-@if [ ! -d $(includedir)  ]; then mkdir -p $(includedir); fi
@@ -127,5 +132,3 @@ lex.cmatrix.c: cmatrix.l
 regex.c regex.h: regex.y constructions.o
 	$(YACC) --defines=$*.h --output=$*.c $<
 
-clean:
-	$(RM) foma flookup cgflookup $(FOMAOBJS) $(LIBOBJS) flookup.o cgflookup.o regex.h regex.c regex.output lex.yy.c lex.lexc.c lex.interface.c lex.cmatrix.c *.so* *.dylib* *.a libfoma.pc
