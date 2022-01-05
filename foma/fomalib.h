@@ -33,7 +33,13 @@ extern "C" {
 
 #define INLINE inline
 
+#ifdef BUILD_DLL
 #define FEXPORT __declspec(dllexport)
+#else
+#define FEXPORT __declspec(dllimport)
+#endif
+
+// #define FEXPORT __declspec(dllexport)
 
 /* Library version */
 #define MAJOR_VERSION 0
