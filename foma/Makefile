@@ -82,7 +82,7 @@ libfoma_win: libfoma_win_01.dll
 libfoma_win.dll: $(LIBOBJS)
 	$(AR) $(ARFLAGS) $(STATICLIB) $(LIBOBJS)
 	$(RANLIB) $(STATICLIB)
-	$(CC) $(CFLAGS) -shared -Wl,$(DFLAG),libfoma_win.dll -o libfoma_win_01.dll $(LIBOBJS) $(LDFLAGS)
+	$(CC) $(CFLAGS) -shared -Wl,$(DFLAG),libfoma_win_0.dll -o libfoma_win_01.dll $(LIBOBJS) $(LDFLAGS)
 
 install: foma libfoma libfoma.pc
 	-@if [ ! -d $(exec_prefix) ]; then mkdir -p $(exec_prefix); fi
