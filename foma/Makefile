@@ -77,7 +77,9 @@ $(SHAREDLIBV): $(LIBOBJS)
 	$(RANLIB) $(STATICLIB)
 	$(CC) $(CFLAGS) -shared -Wl,$(DFLAG),$(SHAREDLIBM) -o $(SHAREDLIBV) $(LIBOBJS) $(LDFLAGS)
 
-libfoma_win: libfoma_win.dll:
+libfoma_win: libfoma_win_01.dll
+
+libfoma_win.dll: $(LIBOBJS)
 	$(AR) $(ARFLAGS) $(STATICLIB) $(LIBOBJS)
 	$(RANLIB) $(STATICLIB)
 	$(CC) $(CFLAGS) -shared -Wl,$(DFLAG),libfoma_win.dll -o libfoma_win_01.dll $(LIBOBJS) $(LDFLAGS)
