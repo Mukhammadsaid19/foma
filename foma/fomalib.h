@@ -378,7 +378,7 @@ FEXPORT char *apply_words(struct apply_handle *h);
 FEXPORT char *apply_random_lower(struct apply_handle *h);
 FEXPORT char *apply_random_upper(struct apply_handle *h);
 FEXPORT char *apply_random_words(struct apply_handle *h);
-FEXPORT void hello_foma();
+FEXPORT int  hello_foma();
 /* Reset the iterator to start anew with enumerating functions */
 FEXPORT void apply_reset_enumerator(struct apply_handle *h);
 FEXPORT void apply_index(struct apply_handle *h, int inout, int densitycutoff, int mem_limit, int flags_only);

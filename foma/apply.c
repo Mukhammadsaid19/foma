@@ -68,8 +68,8 @@ static void apply_stack_pop (struct apply_handle *h);
 static void apply_stack_push (struct apply_handle *h, int vmark, char *sflagname, char *sflagvalue, int sflagneg);
 static void apply_force_clear_stack(struct apply_handle *h);
 
-void hello_foma() {
-    printf("Hello from foma.\n");
+int hello_foma() {
+    return 42;
 }
 
 void apply_set_obey_flags(struct apply_handle *h, int value) {
