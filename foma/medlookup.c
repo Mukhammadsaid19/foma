@@ -78,46 +78,21 @@ static struct lookup_chain *chain_head, *chain_tail, *chain_new, *chain_pos;
 static fsm_read_binary_handle fsrh;
 
 struct fsm *med_net;
-struct apply_handle *med_handle;
+struct apply_med_handle *medh;
 
-struct fsm *t_net;
-struct apply_handle *t_ah;
+struct fsm *check_net;
+struct apply_handle *checkh;
 
 static char *(*applyer)() = &apply_up;  /* Default apply direction = up */
-// static void med_lookup(char *s);
-static void return_wrong_words(char *line);
-static void recognize(char *word);
+static void med_lookup(char *s);
 static void handle_line(char *s);
 static void app_print(char *result);
 static char *get_next_line();
 static void server_init();
-static char *ltrim(char *s);
-static char *rtrim(char *s);
-static char *t_trim(char *s);
-
-char *ltrim(char *s)
-{
-    while(isspace(*s)) s++;
-    return s;
-}
-
-char *rtrim(char *s)
-{
-    char* back = s + strlen(s);
-    while(isspace(*--back));
-    *(back+1) = '\0';
-    return s;
-}
-
-char *t_trim(char *s)
-{
-    return rtrim(ltrim(s)); 
-}
 
 void app_print(char *result) {
 
 	if (result != NULL) {
-
     if (!mode_server) {
 	if (echo == 1) {
 	    fprintf(stdout, "%s%s",line, separator);
@@ -148,11 +123,14 @@ void app_print(char *result) {
 }
 
 int main(int argc, char *argv[]) {
-	t_net = fsm_read_binary_file("tokenize.foma");
-	t_ah = apply_init(t_net);
+    med_net = fsm_read_binary_file("analyzer-spellcheck.fst"); 
+    medh = apply_med_init(med_net);
+    apply_med_set_heap_max(medh, 4194304);
+    apply_med_set_med_limit(medh, 10); 
+    apply_med_set_med_cutoff(medh, 5); 
 
-    med_net = fsm_read_binary_file("analyzer-spellcheck.fst");
-    med_handle = apply_init(med_net);
+    // check_net = fsm_read_binary_file("model.foma");
+    // checkh = apply_init(check_net);
 
     // result = apply_up(ah, sentence);
 
@@ -306,9 +284,7 @@ int main(int argc, char *argv[]) {
 	    results = 0;
 	    udpsize = 0;
 	    serverstring[0] = '\0';
-	    // handle_line(line);
-        // med_lookup(line);
-		return_wrong_words(line);
+        med_lookup(line);
 	    if (results == 0) {
 		app_print(NULL);
 	    }
@@ -326,7 +302,7 @@ int main(int argc, char *argv[]) {
 	while (get_next_line() != NULL) {
 	    results = 0;
 	    // handle_line(line);
-		return_wrong_words(line);
+		med_lookup(line);
 	    if (results == 0) {
 		app_print(NULL);
 	    }
@@ -362,110 +338,16 @@ char *get_next_line() {
     return r;
 }
 
-void return_wrong_words(char* sentence) {
-	char *split = apply_up(t_ah, sentence);
+void med_lookup(char *s) {
+	char *result;
 
-    if (split == NULL) {
-        app_print("???\n");
-        return;
-    }
-	
+	while (result = apply_med(medh, s)) {
+		// printf("looping through...");
+		s = NULL;
+        app_print(result);
 
-	char *token = strtok(split, " \n");
-
-
-	while (token != NULL) {
-		// app_print(trim(token));
-		recognize(t_trim(token));
-		token = strtok(NULL, " \n");
+		// printf("%s\n%s\nCost:%i\n\n", result, apply_med_get_instring(medh), apply_med_get_cost(medh));
 	}
-}
-
-void recognize(char* word) {
-	char* result = apply_up(med_handle, word);
-	
-
-    if (result == NULL) {
-		app_print(word);
-        // printf("???\n");
-        // return;
-    } 
-    // for (i = list_limit; i > 0; i--) {
-    //     result = apply_up(ah, NULL);
-    //     if (result == NULL)
-    //         break;
-    //     printf("%s\n",result);
-    // }
-}
-
-// char* tokenize(char *sentence) {
-// 	result = apply_up(t_ah, sentence);
-
-//     if (result == NULL) {
-//         printf("???\n");
-//         return;
-//     } else {
-// 		return result;
-//         // printf("%s\n", result);
-//     }
-//     // for (i = list_limit; i > 0; i--) {
-//     //     result = apply_up(ah, NULL);
-//     //     if (result == NULL)
-//     //         break;
-//     //     // printf("%s\n",result);
-// 	// 	return result;
-//     // }
-// }
-
-void handle_line(char *s) {
-    char *result, *tempstr;
-    /* Apply alternative */
-    if (apply_alternates == 1) {
-	for (chain_pos = chain_head, tempstr = s;   ; chain_pos = chain_pos->next) {
-	    result = applyer(chain_pos->ah, tempstr);
-	    if (result != NULL) {
-		results++;
-		app_print(result);
-		while ((result = applyer(chain_pos->ah, NULL)) != NULL) {
-		    results++;
-		    app_print(result);
-		}
-		break;
-	    }
-	    if (chain_pos == chain_tail) {
-		break;
-	    }
-	}
-    } else {
-
-	/* Get result from chain */
-	for (chain_pos = chain_head, tempstr = s;  ; chain_pos = chain_pos->next) {
-	    result = applyer(chain_pos->ah, tempstr);
-	    if (result != NULL && chain_pos != chain_tail) {
-		tempstr = result;
-		continue;
-	    }
-	    if (result != NULL && chain_pos == chain_tail) {
-		do {
-		    results++;
-		    app_print(result);
-		} while ((result = applyer(chain_pos->ah, NULL)) != NULL);
-	    }
-	    if (result == NULL) {
-		/* Move up */
-		for (chain_pos = chain_pos->prev; chain_pos != NULL; chain_pos = chain_pos->prev) {
-		    result = applyer(chain_pos->ah, NULL);
-		    if (result != NULL) {
-			tempstr = result;
-			break;
-		    }
-		}
-	    }
-	    if (chain_pos == NULL) {
-		break;
-	    }
-	}
-    }
 }
 
 void server_init(void) {
