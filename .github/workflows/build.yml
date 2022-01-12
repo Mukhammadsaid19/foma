@@ -39,6 +39,7 @@ jobs:
         path: |
           foma/foma.exe
           foma/flookup.exe
+          foma/medlookup.exe
           foma/cgflookup.exe
           foma/*.dll
           foma/README*
