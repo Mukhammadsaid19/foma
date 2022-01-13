@@ -77,7 +77,7 @@ $(SHAREDLIBV): $(LIBOBJS)
 dllfoma: $(LIBOBJS)
 	$(AR) $(ARFLAGS) $(STATICLIB) $(LIBOBJS)
 	$(RANLIB) $(STATICLIB)
-	$(CC) $(CFLAGS) -shared -Wl,$(DFLAG),dllfoma.dll -o dllfoma.0.dll $(LIBOBJS) $(LDFLAGS)
+	$(CC) $(CFLAGS) -o dllfoma.dll $(LIBOBJS) -s -shared -Wl,--subsystem,windows,--out-implib,libfoma.a $(LDFLAGS)
 	
 
 install: foma libfoma libfoma.pc
