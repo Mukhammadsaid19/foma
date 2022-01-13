@@ -20,16 +20,13 @@ CFLAGS = -O3 -Wall -D_GNU_SOURCE -std=c99 -fvisibility=hidden -fPIC
 FOMAOBJS = foma.o stack.o iface.o lex.interface.o
 LIBOBJS = int_stack.o define.o determinize.o apply.o rewrite.o lexcread.o topsort.o flags.o minimize.o reverse.o extract.o sigma.o io.o structures.o constructions.o coaccessible.o utf8.o spelling.o dynarray.o mem.o stringhash.o trie.o lex.lexc.o lex.yy.o lex.cmatrix.o regex.o
 
-all: libfoma foma flookup cgflookup medlookup
+all: libfoma foma flookup cgflookup dllfoma
 
 foma: $(FOMAOBJS) $(LIBOBJS)
 	$(CC) $(CFLAGS) $(FOMAOBJS) $(LIBOBJS) $(LDFLAGS) -o $@
 
 flookup: flookup.o libfoma
 	$(CC) $(CFLAGS) flookup.o $(FLOOKUPLDFLAGS) -o $@
-
-medlookup: medlookup.o libfoma
-	$(CC) $(CFLAGS) medlookup.o $(FLOOKUPLDFLAGS) -o $@
 
 cgflookup: cgflookup.o libfoma
 	$(CC) $(CFLAGS) cgflookup.o $(FLOOKUPLDFLAGS) -o $@
@@ -76,6 +73,12 @@ $(SHAREDLIBV): $(LIBOBJS)
 	$(AR) $(ARFLAGS) $(STATICLIB) $(LIBOBJS)
 	$(RANLIB) $(STATICLIB)
 	$(CC) $(CFLAGS) -shared -Wl,$(DFLAG),$(SHAREDLIBM) -o $(SHAREDLIBV) $(LIBOBJS) $(LDFLAGS)
+
+dllfoma: $(LIBOBJS)
+	$(AR) $(ARFLAGS) $(STATICLIB) $(LIBOBJS)
+	$(RANLIB) $(STATICLIB)
+	$(CC) $(CFLAGS) -shared -Wl,$(DFLAG),dllfoma.dll -o dllfoma.0.dll $(LIBOBJS) $(LDFLAGS)
+	
 
 install: foma libfoma libfoma.pc
 	-@if [ ! -d $(exec_prefix) ]; then mkdir -p $(exec_prefix); fi
