@@ -35,6 +35,8 @@ extern "C" {
 
 #define FEXPORT __declspec(dllexport)
 
+// #define FEXPORT __attribute__((visibility("default")))
+
 /* Library version */
 #define MAJOR_VERSION 0
 #define MINOR_VERSION 10
@@ -378,7 +380,6 @@ FEXPORT char *apply_words(struct apply_handle *h);
 FEXPORT char *apply_random_lower(struct apply_handle *h);
 FEXPORT char *apply_random_upper(struct apply_handle *h);
 FEXPORT char *apply_random_words(struct apply_handle *h);
-FEXPORT int  hello_foma();
 /* Reset the iterator to start anew with enumerating functions */
 FEXPORT void apply_reset_enumerator(struct apply_handle *h);
 FEXPORT void apply_index(struct apply_handle *h, int inout, int densitycutoff, int mem_limit, int flags_only);
@@ -517,6 +518,8 @@ FEXPORT int fsm_get_next_state_arc(struct fsm_read_handle *handle);
 
 /* Frees memory associated with a read handle */
 FEXPORT void fsm_read_done(struct fsm_read_handle *handle);
+
+FEXPORT int Add(int a, int b);
 
 #ifdef  __cplusplus
 }
