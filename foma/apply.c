@@ -68,9 +68,6 @@ static void apply_stack_pop (struct apply_handle *h);
 static void apply_stack_push (struct apply_handle *h, int vmark, char *sflagname, char *sflagvalue, int sflagneg);
 static void apply_force_clear_stack(struct apply_handle *h);
 
-int hello_foma() {
-    return 42;
-}
 
 void apply_set_obey_flags(struct apply_handle *h, int value) {
     h->obey_flags = value;
@@ -257,6 +254,10 @@ char *apply_down(struct apply_handle *h, char *word) {
     }
     h->binsearch = (h->last_net->arcs_sorted_in == 1) ? 1 : 0;
     return(apply_updown(h, word));
+}
+
+int Add(int a, int b) {
+	return a + b;
 }
 
 char *apply_up(struct apply_handle *h, char *word) {
